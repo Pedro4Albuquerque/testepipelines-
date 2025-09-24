@@ -17,27 +17,16 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x, 20.x]
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
-
-      - name: Install deps
-        run: npm ci
-
-      - name: Run tests (with coverage)
-        run: npm test -- --coverage
-
-      - name: Upload coverage artifact
-        if: always()
+      - run: npm ci
+      - run: npm test -- --coverage
+      - if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.node-version }}
@@ -51,31 +40,24 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
 
-      # --- DEBUG opcional (mostra a resposta da API do Sleuth) ---
-      # Se quiser ver o motivo exato de falha, deixe este passo habilitado:
+      # (Opcional) diagnóstico 401
       - name: Debug Sleuth API (curl)
         env:
           SLEUTH_API_KEY: ${{ secrets.SLEUTH_API_KEY }}
-          ORG: pedro-albuquerque
-          DEP: testepipelines-
-          ENV: production
         run: |
           set -e
-          echo "Calling Sleuth API (diagnostic)..."
-          curl -i -X POST "https://app.sleuth.io/api/1/deployments/$ORG/$DEP/register_deploy" \
+          curl -i -X POST "https://app.sleuth.io/api/1/deployments/pedro-albuquerque/testepipelines-/register_deploy" \
             -H "Authorization: Bearer $SLEUTH_API_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"sha\":\"${GITHUB_SHA}\",\"environment\":\"$ENV\"}"
+            -d '{"sha":"'"${GITHUB_SHA}"'","environment":"production"}'
 
-      # --- Notificação oficial ao Sleuth ---
       - name: Notify Sleuth
         uses: sleuth-io/sleuth-action@main
         with:
-          organization-slug: pedro-albuquerque     # org no Sleuth
-          deployment-slug: testepipelines-         # Code Deployment slug no Sleuth
-          environment: production                  # deve existir no Sleuth
+          organization-slug: pedro-albuquerque
+          deployment-slug: testepipelines-
+          environment: production
           sha: ${{ github.sha }}
           api-key: ${{ secrets.SLEUTH_API_KEY }}
