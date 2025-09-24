@@ -1,22 +1,28 @@
-name: Node.js CI
+name: Node.js CI + Sleuth notify
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]        # mantenha "main" ou troque se usar outra
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
+
+concurrency:
+  group: prod-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, 20.x]   # testa em duas versões LTS
+        node-version: [18.x, 20.x]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # histórico completo melhora o Lead Time
 
       - name: Setup Node ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -36,3 +42,25 @@ jobs:
         with:
           name: coverage-${{ matrix.node-version }}
           path: coverage
+
+  notify_sleuth:
+    name: Register deploy in Sleuth
+    needs: test
+    # só notifica em push (não em PR)
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production     # deve bater com o ambiente no Sleuth
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Notify Sleuth
+        uses: sleuth-io/sleuth-action@main
+        with:
+          organization-slug: pedro-albuquerque         
+          deployment-slug: testeipipelines-      
+          environment: production
+          sha: ${{ github.sha }}
+          email: ${{ github.event.pusher.email }}
+          api-key: ${{ secrets.SLEUTH_API_KEY }}
