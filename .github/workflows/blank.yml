@@ -2,7 +2,7 @@ name: Node.js CI + Sleuth notify
 
 on:
   push:
-    branches: [ "main" ]        # mantenha "main" ou troque se usar outra
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0        # histórico completo melhora o Lead Time
+          fetch-depth: 0
 
       - name: Setup Node ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -46,20 +46,19 @@ jobs:
   notify_sleuth:
     name: Register deploy in Sleuth
     needs: test
-    # só notifica em push (não em PR)
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    environment: production     # deve bater com o ambiente no Sleuth
+    environment: production
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Notify Sleuth
-        uses: sleuth-io/sleuth-action@main
+        uses: sleuth-io/sleuth-action@v1
         with:
-          organization-slug: pedro-albuquerque         
-          deployment-slug: testepipelines-      
+          organization-slug: pedro-albuquerque
+          deployment-slug: testepipelines-
           environment: production
           sha: ${{ github.sha }}
           api-key: ${{ secrets.SLEUTH_API_KEY }}
