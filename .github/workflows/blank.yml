@@ -62,5 +62,4 @@ jobs:
           deployment-slug: testeipipelines-      
           environment: production
           sha: ${{ github.sha }}
-          email: ${{ github.event.pusher.email }}
           api-key: ${{ secrets.SLEUTH_API_KEY }}
