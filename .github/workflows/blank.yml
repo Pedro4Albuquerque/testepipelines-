@@ -55,7 +55,7 @@ jobs:
           fetch-depth: 0
 
       - name: Notify Sleuth
-        uses: sleuth-io/sleuth-action@v1
+        uses: sleuth-io/sleuth-action@main
         with:
           organization-slug: pedro-albuquerque
           deployment-slug: testepipelines-
