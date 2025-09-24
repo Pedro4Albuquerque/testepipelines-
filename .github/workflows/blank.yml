@@ -58,7 +58,7 @@ jobs:
         uses: sleuth-io/sleuth-action@main
         with:
           organization-slug: pedro-albuquerque
-          deployment-slug: testepipelines-
+          deployment-slug: pedro-albuquerque-app
           environment: production
           sha: ${{ github.sha }}
           api-key: ${{ secrets.SLEUTH_API_KEY }}
