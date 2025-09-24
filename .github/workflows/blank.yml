@@ -58,7 +58,7 @@ jobs:
         uses: sleuth-io/sleuth-action@main
         with:
           organization-slug: pedro-albuquerque
-          deployment-slug: pedro-albuquerque-app
-          environment: production
+          deployment-slug: testepipelines-   # <- slug correto do Sleuth
+          environment: production            # <- deve existir no Sleuth
           sha: ${{ github.sha }}
           api-key: ${{ secrets.SLEUTH_API_KEY }}
