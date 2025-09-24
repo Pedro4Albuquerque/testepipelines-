@@ -42,7 +42,7 @@ jobs:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
 
-      # (Opcional) diagnóstico 401
+      # diagnóstico 401
       - name: Debug Sleuth API (curl)
         env:
           SLEUTH_API_KEY: ${{ secrets.SLEUTH_API_KEY }}
