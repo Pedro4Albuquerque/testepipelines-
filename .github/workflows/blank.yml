@@ -43,12 +43,15 @@ jobs:
     steps:
       - name: Notify Sleuth via API
         env:
-          SLEUTH_DEPLOY_TOKEN: ${{ secrets.SLEUTH_DEPLOY_TOKEN }}
+          SLEUTH_API_KEY: ${{ secrets.SLEUTH_API_KEY }}
+          ORG: pedro-albuquerque
+          DEP: testepipelines-
+          ENV: PRODUCTION     # tem que ser igual ao nome no Sleuth
           SHA: ${{ github.sha }}
         run: |
           set -e
-          echo "POST to Sleuth (sha=$SHA, env=production)"
-          curl -i -X POST "https://app.sleuth.io/api/1/deployments/pedro-albuquerque/testepipelines-/register_deploy" \
-            -H "Authorization: Bearer $SLEUTH_DEPLOY_TOKEN" \
+          echo "POST /api/1/deployments/$ORG/$DEP/register_deploy (sha=$SHA, env=$ENV)"
+          curl -i -X POST "https://app.sleuth.io/api/1/deployments/$ORG/$DEP/register_deploy" \
+            -H "Authorization: Bearer $SLEUTH_API_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"sha\":\"$SHA\",\"environment\":\"production\"}"
+            -d "{\"sha\":\"$SHA\",\"environment\":\"$ENV\"}"
